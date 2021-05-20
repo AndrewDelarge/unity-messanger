@@ -9,7 +9,7 @@ namespace UI.Windows.Chat.Elements
     {
         [SerializeField] private Button deleteModeButton;
         [SerializeField] private Button submitButton;
-        [SerializeField] private Text messageText;
+        [SerializeField] private InputField messageInput;
         
         public Action OnDeleteModeButtonClick;
         public Action<string> OnTextSubmit;
@@ -27,7 +27,11 @@ namespace UI.Windows.Chat.Elements
 
         private void SubmitMessage()
         {
-            OnTextSubmit?.Invoke(messageText.text);
+            if (messageInput.text.Equals(String.Empty))
+                return;
+            
+            OnTextSubmit?.Invoke(messageInput.text);
+            messageInput.text = String.Empty;
         }
         
     }
