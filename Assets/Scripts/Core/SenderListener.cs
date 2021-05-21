@@ -43,7 +43,6 @@ namespace Core
                 return;
                 
             onMessageReceived?.Invoke(message);
-            Debug.LogWarning($"Received message from: {message.user.credentials.FirstName} message: {message.text}");
         }
 
         public void DeleteMessage(Message message)

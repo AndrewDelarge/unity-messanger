@@ -5,6 +5,7 @@ using Core.LocalData;
 using Core.MessageSender;
 using UI.WindowConfigs;
 using UnityEngine;
+using User = Core.Model.User;
 
 namespace Core
 {
@@ -12,7 +13,7 @@ namespace Core
     {
         // TODO TEMP
         public Chat currentChat;
-
+        public User authorizedUser;
         
         private void Awake()
         {
@@ -22,7 +23,7 @@ namespace Core
         private void Init()
         {
             UIManager.Instance().Init();
-
+            
             ToAuthorizeState();
         }
 
@@ -70,15 +71,23 @@ namespace Core
         private List<Model.Chat> LoadChats()
         {
             var chatList = new List<Model.Chat>();
+            var chatUsersList = new List<User>();
             
-            var chatUsersList = new List<Model.User>();
+            authorizedUser = new User(currentChat.Owner.FirstName, currentChat.Owner.LastName,
+                currentChat.Owner.Avatar);
+            
             foreach (var user in currentChat.Users)
             {
-                chatUsersList.Add(new Model.User(user.FirstName, user.LastName, user.Avatar));
+                if (user == currentChat.Owner)
+                {
+                    chatUsersList.Add(authorizedUser);
+                    continue;
+                }
+                chatUsersList.Add(new User(user.FirstName, user.LastName, user.Avatar));
             }
             
             var chat = new Model.Chat(
-                new Model.User(currentChat.Owner.FirstName, currentChat.Owner.LastName, currentChat.Owner.Avatar),
+                authorizedUser,
                 chatUsersList
             );
 
