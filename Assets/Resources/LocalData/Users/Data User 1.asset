@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c33752d199545afbb1a8dde84289975, type: 3}
-  m_Name: New Data User 1
+  m_Name: Data User 1
   m_EditorClassIdentifier: 
   firstName: "\u0429\u0430\u0441\u0442\u0438\u0441\u043B\u0430\u0432"
   lastName: "\u0416\u0430\u0431\u0447\u0435\u043D\u043A\u043E"

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 151924c18f2b41c4bbcf0237c7c24d05, type: 3}
-  m_Name: New Data Chat
+  m_Name: Chat
   m_EditorClassIdentifier: 
   owner: {fileID: 11400000, guid: 9f10cedcf7997a546835721f132e3b37, type: 2}
   users:
