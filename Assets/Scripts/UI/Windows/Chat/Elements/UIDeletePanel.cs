@@ -9,6 +9,7 @@ namespace UI.Windows.Chat.Elements
         [SerializeField] private Button completeDeleteButton;
 
         public Action OnCompleteDeleteClick;
+        
         private void OnEnable()
         {
             completeDeleteButton.onClick.AddListener((() => OnCompleteDeleteClick?.Invoke()));

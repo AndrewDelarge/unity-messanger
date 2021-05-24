@@ -1,5 +1,6 @@
 using System;
 using CodeLib;
+using Core.MessageSender;
 using Core.Model;
 
 namespace Core.Base
@@ -14,11 +15,5 @@ namespace Core.Base
         
         public abstract void RemoveListener(ISenderListener listener);
 
-    }
-
-    public interface IListenable
-    {
-        void AddListener(ISenderListener listener);
-        void RemoveListener(ISenderListener listener);
     }
 }

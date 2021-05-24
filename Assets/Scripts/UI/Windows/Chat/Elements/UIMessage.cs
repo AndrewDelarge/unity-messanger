@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Core.Model;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,67 +13,98 @@ namespace UI.Windows.Chat.Elements
             WithTail,
             Tailless
         }
-        
-        public RectTransform parentRectTransform;
+
+        [Header("Elements")]
+        [SerializeField] private RectTransform mainRectTransform;
+        [SerializeField] private VerticalLayoutGroup textsLayout;
 
         [SerializeField] private Text nameText;
         [SerializeField] private Text messageText;
         [SerializeField] private Text timeText;
+        
+        [SerializeField] private Image avatar;
+        [SerializeField] private Button deleteButton;
 
+        [Header("Background")]
         [SerializeField] private Image tailedBackground;
         [SerializeField] private Image taillessBackground;
 
-        // TEMP
-        [SerializeField] private int maxTextWidth = 450;
-        [SerializeField] private int minTextWidth = 200;
+        private float maxTextWidth = 415;
+        private float minTextWidth = 200;
 
-        private Message message;
-        public void Init(Message message)
+        public Message message { get; private set; }
+        public Action<UIMessage> onDeleteClick;
+
+        private Type currentType;
+
+        private Text[] resizeableTextElements;
+
+        public void Init(Message message, float maxTextWidth, float minTextWidth)
         {
-            this.message = message;
-            messageText.text = message.text;
-            nameText.text = $"{message.user.credentials.FirstName} {message.user.credentials.LastName}";
+            this.maxTextWidth = maxTextWidth;
+            this.minTextWidth = minTextWidth;
             
-//            CanvasRenderer.onRequestRebuild += ResizeTextFields;
+            deleteButton.onClick.AddListener(() => onDeleteClick?.Invoke(this));
+            
+            resizeableTextElements = new [] {messageText, nameText, timeText};
+            
+            SetMessageData(message);
             Resize();
         }
 
-        
-        private void Resize()
+
+        private void SetMessageData(Message message)
         {
-            // TODO REFACTOR THIS
-            if (messageText.preferredWidth > maxTextWidth)
-            {
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxTextWidth);
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (messageText.preferredWidth / maxTextWidth + 1) * messageText.fontSize);
-            }
-
-            if (messageText.preferredWidth < maxTextWidth & messageText.preferredWidth >= minTextWidth)
-            {
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, messageText.preferredWidth);
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, messageText.preferredHeight);
-            }
-
-            if (messageText.preferredWidth <= minTextWidth)
-            {
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, minTextWidth);
-                messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, messageText.preferredHeight);
-            }
-
-            timeText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, messageText.rectTransform.sizeDelta.x);
-            nameText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, messageText.rectTransform.sizeDelta.x);
+            this.message = message;
             
-            
-            var commonHeigth = timeText.rectTransform.sizeDelta.y + messageText.rectTransform.sizeDelta.y +
-                              nameText.rectTransform.sizeDelta.y;
-            
-            parentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, commonHeigth);
+            nameText.text = $"{message.user.credentials.FirstName} {message.user.credentials.LastName}";
+            messageText.text = message.text;
+            timeText.text = message.time.ToString("HH:mm:ss");
+            avatar.sprite = message.user.avatar;
         }
 
-
-        public Message GetMessage()
+        private void Resize()
         {
-            return message;
+            float elementsWidth = maxTextWidth;
+            float elementsHeight = (messageText.preferredWidth / maxTextWidth + 1) * messageText.fontSize;
+            
+            if (messageText.preferredWidth < maxTextWidth & messageText.preferredWidth > minTextWidth)
+            {
+                elementsWidth = messageText.preferredWidth;
+                elementsHeight = messageText.preferredHeight;
+            }
+            
+            if (messageText.preferredWidth <= minTextWidth)
+            {
+                elementsWidth = minTextWidth;
+                elementsHeight = messageText.preferredHeight;
+            }
+
+            foreach (var textElement in resizeableTextElements)
+            {
+                textElement.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, elementsWidth);
+            }
+            
+            messageText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, elementsHeight);
+            
+            mainRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, GetElementHeight());
+        }
+
+        private float GetElementHeight()
+        {
+            float resultHeight = 0;
+            int activeElements = 0;
+
+            foreach (var textElement in resizeableTextElements)
+            {
+                if (! textElement.gameObject.activeSelf)
+                    continue;
+
+                resultHeight += textElement.rectTransform.sizeDelta.y;
+                activeElements++;
+            }
+            
+            return resultHeight + textsLayout.padding.vertical + (textsLayout.spacing * (activeElements - 1));
         }
 
         public void SetType(Type type)
@@ -81,17 +114,32 @@ namespace UI.Windows.Chat.Elements
                 case Type.WithTail:
                     taillessBackground.gameObject.SetActive(false);
                     tailedBackground.gameObject.SetActive(true);
+                    avatar.gameObject.SetActive(true);
                     nameText.gameObject.SetActive(true);
                     break;
                 case Type.Tailless:
                     taillessBackground.gameObject.SetActive(true);
                     tailedBackground.gameObject.SetActive(false);
+                    avatar.gameObject.SetActive(false);
                     nameText.gameObject.SetActive(false);
                     break;
             }
-            
+
+            currentType = type;
             Resize();
         }
-        
+
+
+        public void ToggleDeleteButtonActive(bool active)
+        {
+            if (currentType == Type.WithTail)
+            {
+                avatar.gameObject.SetActive(! active);
+            }
+            
+            deleteButton.gameObject.SetActive(active);
+        }
+
+
     }
 }

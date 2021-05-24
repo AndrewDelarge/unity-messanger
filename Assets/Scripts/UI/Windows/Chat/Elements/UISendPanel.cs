@@ -13,6 +13,7 @@ namespace UI.Windows.Chat.Elements
         
         public Action OnDeleteModeButtonClick;
         public Action<string> OnTextSubmit;
+        
         private void OnEnable()
         {
             deleteModeButton.onClick.AddListener(() => OnDeleteModeButtonClick?.Invoke());

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core;
@@ -5,68 +6,72 @@ using Core.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 namespace UI.Windows.Chat.Elements
 {
     public class UIMessagesHolder : MonoBehaviour
     {
         [SerializeField] private RectTransform messagesHolder;
-        
-        // TODO probably move to chat window
-        [SerializeField] private UIMessage ownerMessageTemplate;
-        [SerializeField] private UIMessage messageTemplate;
-        
         [SerializeField] private UIMessageGroup messageGroupTemplate;
         
-        private List<UIMessage> messages = new List<UIMessage>();
+        [Header("Message text params")]
+        [SerializeField] private int maxTextWidth = 415;
+        [SerializeField] private int minTextWidth = 200;
+        
         private List<UIMessageGroup> messageGroups = new List<UIMessageGroup>();
         
-        public void AddMessage(Message message)
+        public Action<UIMessage> onMessageDeleteButtonClick;
+        
+        public void AddMessage(Message message, UIMessage template)
         {
-            var currentMessageTemplate = message.user.Equals(AppManager.Instance().authorizedUser) 
-                ? ownerMessageTemplate 
-                : messageTemplate;
+            var messageGroup = GetOrCreateGroup(message.user);
+            var messageObject = Instantiate(template, messagesHolder);
             
-            var messageObject = Instantiate(currentMessageTemplate, messagesHolder);
-            var lastMessage = messages.Count > 0 ? messages[messages.Count - 1] : null;
-            UIMessageGroup messageGroup;
-            
-            messageObject.SetType(UIMessage.Type.WithTail);
-            messageObject.Init(message);
-            
-            messages.Add(messageObject);
+            messageObject.Init(message, maxTextWidth, minTextWidth);
+            messageObject.onDeleteClick += (m) => onMessageDeleteButtonClick?.Invoke(m);
 
-            if (lastMessage == null)
-            {
-                messageGroup = Instantiate(messageGroupTemplate, messagesHolder);
-                messageGroup.AddMessage(messageObject);
-
-                messageGroups.Add(messageGroup);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder);
-                return;
-            }
-
-            if (lastMessage.GetMessage().user.Equals(message.user))
-            {
-                messageGroups[messageGroups.Count - 1].AddMessage(messageObject);
-                lastMessage.SetType(UIMessage.Type.Tailless);
-
-                LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder);
-                return;
-            } 
-            
-            messageGroup = Instantiate(messageGroupTemplate, messagesHolder);
             messageGroup.AddMessage(messageObject);
             
-            messageGroups.Add(messageGroup);
             LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder);
         }
 
-        public void RemoveMessage(Message message)
+        public void RemoveMessage(UIMessage message)
         {
-            var uiMessage = messages.Find(x => x.GetMessage() == message);
-            messages.Remove(uiMessage);
+            var messageGroup = messageGroups.Find(x => x.IsMessageExists(message));
+            messageGroup.RemoveMessage(message);
+
+            if (! messageGroup.AnyMessages())
+            {
+                messageGroups.Remove(messageGroup);
+                Destroy(messageGroup.gameObject);
+            }
             
-            Destroy(uiMessage);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder);
+        }
+
+        public void ToggleMessagesDeleteButtons(bool active)
+        {
+            foreach (var messageGroup in messageGroups)
+            {
+                if (messageGroup.user == AppData.authorizedUser)
+                {
+                    messageGroup.ToggleMessagesDeleteButtons(active);
+                }
+            }
+        }
+
+        private UIMessageGroup GetOrCreateGroup(User user)
+        {
+            UIMessageGroup messageGroup = messageGroups.Count > 0 ? messageGroups.Last() : null;
+            
+            if (messageGroup == null || ! messageGroup.user.Equals(user))
+            {
+                messageGroup = Instantiate(messageGroupTemplate, messagesHolder);
+                messageGroups.Add(messageGroup);
+            }
+            
+            return messageGroup;
         }
     }
 }
