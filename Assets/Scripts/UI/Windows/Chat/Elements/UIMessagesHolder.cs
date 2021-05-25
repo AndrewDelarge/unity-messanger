@@ -26,8 +26,8 @@ namespace UI.Windows.Chat.Elements
         public void AddMessage(Message message, UIMessage template)
         {
             var messageGroup = GetOrCreateGroup(message.user);
-            var messageObject = Instantiate(template, messagesHolder);
-            
+            var messageObject = Instantiate(template, messageGroup.transform);
+
             messageObject.Init(message, maxTextWidth, minTextWidth);
             messageObject.onDeleteClick += (m) => onMessageDeleteButtonClick?.Invoke(m);
 

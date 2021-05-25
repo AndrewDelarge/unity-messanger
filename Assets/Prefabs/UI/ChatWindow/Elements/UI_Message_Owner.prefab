@@ -442,6 +442,8 @@ MonoBehaviour:
   deleteButton: {fileID: 2724249073596845904}
   tailedBackground: {fileID: 1047227283430424295}
   taillessBackground: {fileID: 1047227281719028430}
+  showTime: 0.25
+  hideTime: 0.25
 --- !u!1 &1047227282422176872
 GameObject:
   m_ObjectHideFlags: 0

@@ -399,7 +399,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &648390143581843755
@@ -414,6 +414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a464971d2f9b4a8688197f94a8f71ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hideDuration: 0.25
+  showDuration: 0.25
   completeDeleteButton: {fileID: 648390142079623658}
 --- !u!1 &3026651504631569039
 GameObject:
@@ -637,7 +639,7 @@ PrefabInstance:
     - target: {fileID: 1516066652096684220, guid: 44aae353cb63e7f45bde76506e419536,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 1516066652096684220, guid: 44aae353cb63e7f45bde76506e419536,
         type: 3}
@@ -678,6 +680,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1516066652096684221, guid: 44aae353cb63e7f45bde76506e419536,
+        type: 3}
+      propertyPath: hideDuration
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1516066652096684221, guid: 44aae353cb63e7f45bde76506e419536,
+        type: 3}
+      propertyPath: showDuration
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1516066652096684223, guid: 44aae353cb63e7f45bde76506e419536,
         type: 3}

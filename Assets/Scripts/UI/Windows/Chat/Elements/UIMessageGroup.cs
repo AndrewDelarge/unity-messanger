@@ -22,9 +22,9 @@ namespace UI.Windows.Chat.Elements
             
             message.transform.SetParent(transform);
             message.SetType(UIMessage.Type.WithTail);
-            
-            messages.Add(message);
 
+            messages.Add(message);
+            
             message.GetShowAnimationSequence().Play();
         }
         
@@ -51,8 +51,6 @@ namespace UI.Windows.Chat.Elements
             
             seq.Play();
         }
-        
-        
         
         public UIMessage GetLastMessage()
         {

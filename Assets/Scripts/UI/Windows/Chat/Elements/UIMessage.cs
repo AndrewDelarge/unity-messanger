@@ -51,13 +51,13 @@ namespace UI.Windows.Chat.Elements
         {
             this.maxTextWidth = maxTextWidth;
             this.minTextWidth = minTextWidth;
+
+            HideMessage();
             
             deleteButton.onClick.AddListener(() => onDeleteClick?.Invoke(this));
             
             resizeableTextElements = new [] {messageText, nameText, timeText};
             
-            mainRectTransform.DOLocalMoveY(-500, 0f);
-
             SetMessageData(message);
             Resize();
         }
@@ -151,9 +151,10 @@ namespace UI.Windows.Chat.Elements
         public Sequence GetShowAnimationSequence()
         {
             var seq = DOTween.Sequence();
-            
-            seq.Append(mainRectTransform.DOLocalMoveY(0, showTime));
-            
+
+            seq.Append(mainRectTransform.DOLocalMoveY(0, showTime / 2));
+            seq.Append(avatar.transform.DOLocalMoveY(25, showTime / 2));
+
             return seq;
         }
         
@@ -183,6 +184,12 @@ namespace UI.Windows.Chat.Elements
             seq.Append(avatar.transform.DORotate(new Vector3(0, 0), delete ? 0 : .25f));
 
             return seq;
+        }
+
+        public void HideMessage()
+        {
+            mainRectTransform.DOLocalMoveY(-500, 0);
+            avatar.transform.DOLocalMoveY(-500, 0);
         }
 
     }

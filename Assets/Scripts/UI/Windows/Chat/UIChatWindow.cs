@@ -3,6 +3,7 @@ using Core;
 using Core.Base;
 using Core.MessageSender;
 using Core.Model;
+using DG.Tweening;
 using UI.Base;
 using UI.WindowConfigs;
 using UI.Windows.Chat.Elements;
@@ -38,14 +39,15 @@ namespace UI.Windows.Chat
                 
                 context.uiMessagesHolder.ToggleMessagesDeleteButtons(true);
                 context.uiMessagesHolder.onMessageDeleteButtonClick += context.uiMessagesHolder.RemoveMessage;
+                
+                context.uiDeletePanel.GetShowSequence().Play();
             }
             
             public override void Deactivate()
             {
-                context.uiDeletePanel.gameObject.SetActive(false);
-                
                 context.uiMessagesHolder.ToggleMessagesDeleteButtons(false);
                 context.uiMessagesHolder.onMessageDeleteButtonClick -= context.uiMessagesHolder.RemoveMessage;
+                context.uiDeletePanel.GetHideSequence().Play().onKill += () => context.uiDeletePanel.gameObject.SetActive(false);
             }
         }
 
@@ -59,12 +61,16 @@ namespace UI.Windows.Chat
             {
                 context.uiSendPanel.gameObject.SetActive(true);
                 context.uiSendPanel.OnTextSubmit += OnTextSubmit;
+
+                context.uiSendPanel.GetShowSequence().Play();
             }
 
             public override void Deactivate()
             {
-                context.uiSendPanel.gameObject.SetActive(false);
                 context.uiSendPanel.OnTextSubmit -= OnTextSubmit;
+                
+                context.uiSendPanel.GetHideSequence().Play().onKill += () => context.uiSendPanel.gameObject.SetActive(false);
+
             }
             
             private void OnTextSubmit(string text)

@@ -1,10 +1,11 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Windows.Chat.Elements
 {
-    public class UIDeletePanel : MonoBehaviour
+    public class UIDeletePanel : HideablePanel
     {
         [SerializeField] private Button completeDeleteButton;
 

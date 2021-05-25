@@ -26,12 +26,9 @@ namespace Core
         
         private List<UIWindow> currentWindows = new List<UIWindow>();
 
-        [Header("Game windows")]
+        [Header("App windows")]
         [SerializeField] private UIChatWindow uiChatWindow;
 
-        
-//        [Header("LoadingScreen")]
-        
         
         public void Init()
         {
@@ -41,6 +38,8 @@ namespace Core
             InitWindowsDictionary();
 
             SetScreen(UIScreens.None);
+            
+            DontDestroyOnLoad(this);
         }
 
         private void RegisterViewsEvents() {}

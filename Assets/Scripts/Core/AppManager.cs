@@ -21,12 +21,14 @@ namespace Core
 
         private void Init()
         {
-            DOTween.Init(true, true, LogBehaviour.Verbose)
+            DOTween.Init(true, true, LogBehaviour.Default)
                 .SetCapacity(50, 10);
             
             UIManager.Instance().Init();
             
             ToLoadAllChatsState();
+            
+            DontDestroyOnLoad(this);
         }
 
         // TODO Here we should do states 

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UI.Windows.Chat.Elements
 {
-    public class UISendPanel : MonoBehaviour
+    public class UISendPanel : HideablePanel
     {
         [SerializeField] private Button deleteModeButton;
         [SerializeField] private Button submitButton;
@@ -34,6 +34,5 @@ namespace UI.Windows.Chat.Elements
             OnTextSubmit?.Invoke(messageInput.text);
             messageInput.text = String.Empty;
         }
-        
     }
 }
