@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Model;
+using DG.Tweening;
 using UnityEngine;
 
 namespace UI.Windows.Chat.Elements
@@ -9,7 +11,6 @@ namespace UI.Windows.Chat.Elements
     {
         private List<UIMessage> messages = new List<UIMessage>();
         
-        // TODO not best solution ...
         public User user { get; private set; }
 
         public void AddMessage(UIMessage message)
@@ -23,24 +24,36 @@ namespace UI.Windows.Chat.Elements
             message.SetType(UIMessage.Type.WithTail);
             
             messages.Add(message);
-            
-            // Play anim
+
+            message.GetShowAnimationSequence().Play();
         }
         
-        public void RemoveMessage(UIMessage message)
+        public void RemoveMessage(UIMessage message, Action animationDoneCallback = null)
         {
             if (! messages.Remove(message))
                 return;
-            
-            if (AnyMessages())
-                GetLastMessage().SetType(UIMessage.Type.WithTail);
-            
-            // Play anim
-            message.gameObject.SetActive(false);
-            
-            Destroy(message.gameObject);
-        }
 
+            if (AnyMessages())
+            {
+                GetLastMessage().SetType(UIMessage.Type.WithTail);
+            }
+            else
+            {
+                // when all messages will removed, MessageHolder destroy this group and animation sequence will be killed
+                message.transform.SetParent(transform.parent);
+                message.transform.SetSiblingIndex(transform.GetSiblingIndex());
+            }
+            
+            var seq = message.GetHideAnimationSequence();
+            
+            seq.onKill += () => Destroy(message.gameObject);
+            seq.onKill += () => animationDoneCallback?.Invoke();
+            
+            seq.Play();
+        }
+        
+        
+        
         public UIMessage GetLastMessage()
         {
             return messages.Last();
@@ -59,7 +72,16 @@ namespace UI.Windows.Chat.Elements
         public void ToggleMessagesDeleteButtons(bool active)
         {
             foreach (var message in messages)
-                message.ToggleDeleteButtonActive(active);
+            {
+                // rude optimization 
+                if (transform.position.y > Screen.height)
+                {
+                    message.ToggleDeleteButtonActive(active);
+                    continue;
+                } 
+
+                message.GetToggleDeleteSequence(active).Play();
+            }
         }
     }
 }

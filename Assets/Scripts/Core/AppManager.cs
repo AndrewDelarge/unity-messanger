@@ -5,6 +5,7 @@ using Core.Base;
 using Core.LocalData;
 using Core.MessageSender;
 using Core.ResourceLoaders;
+using DG.Tweening;
 using UI.WindowConfigs;
 using UnityEngine;
 using User = Core.Model.User;
@@ -20,6 +21,9 @@ namespace Core
 
         private void Init()
         {
+            DOTween.Init(true, true, LogBehaviour.Verbose)
+                .SetCapacity(50, 10);
+            
             UIManager.Instance().Init();
             
             ToLoadAllChatsState();

@@ -16,7 +16,6 @@ namespace Core.MessageSender
             this.currentChat = chat;
         }
 
-        // TODO Rework
         public void SendMessage(Message message)
         {
             if (! IsChatCorrect(message.chat))

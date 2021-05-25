@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core.Model;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,8 @@ namespace UI.Windows.Chat.Elements
 
         [Header("Elements")]
         [SerializeField] private RectTransform mainRectTransform;
+
+        [SerializeField] private RectTransform messageContainer;
         [SerializeField] private VerticalLayoutGroup textsLayout;
 
         [SerializeField] private Text nameText;
@@ -29,6 +32,11 @@ namespace UI.Windows.Chat.Elements
         [SerializeField] private Image tailedBackground;
         [SerializeField] private Image taillessBackground;
 
+        [Header("Animations")] 
+        [SerializeField] private float showTime = .25f;
+        [SerializeField] private float hideTime = .25f;
+        
+        
         private float maxTextWidth = 415;
         private float minTextWidth = 200;
 
@@ -48,10 +56,11 @@ namespace UI.Windows.Chat.Elements
             
             resizeableTextElements = new [] {messageText, nameText, timeText};
             
+            mainRectTransform.DOLocalMoveY(-500, 0f);
+
             SetMessageData(message);
             Resize();
         }
-
 
         private void SetMessageData(Message message)
         {
@@ -129,7 +138,6 @@ namespace UI.Windows.Chat.Elements
             Resize();
         }
 
-
         public void ToggleDeleteButtonActive(bool active)
         {
             if (currentType == Type.WithTail)
@@ -140,6 +148,42 @@ namespace UI.Windows.Chat.Elements
             deleteButton.gameObject.SetActive(active);
         }
 
+        public Sequence GetShowAnimationSequence()
+        {
+            var seq = DOTween.Sequence();
+            
+            seq.Append(mainRectTransform.DOLocalMoveY(0, showTime));
+            
+            return seq;
+        }
+        
+        public Sequence GetHideAnimationSequence()
+        {
+            var seq = DOTween.Sequence();
+
+            seq.Append(mainRectTransform.DOLocalMoveX(-1000, hideTime));
+            seq.AppendCallback(() => gameObject.SetActive(false));
+            
+            return seq;
+        }
+
+        public Sequence GetToggleDeleteSequence(bool delete)
+        {
+            var seq = DOTween.Sequence();
+            
+            seq.Append(avatar.transform.DORotate(new Vector3(0, 90), delete ? .25f : 0f));
+            seq.Append(deleteButton.transform.DORotate(new Vector3(0, 90), delete ? 0 : .25f));
+            
+            if (currentType == Type.WithTail)
+                seq.AppendCallback(() => avatar.gameObject.SetActive(! delete));
+            
+            seq.AppendCallback(() => deleteButton.gameObject.SetActive(delete));
+            
+            seq.Append(deleteButton.transform.DORotate(new Vector3(0, 0), delete ? .25f : 0));
+            seq.Append(avatar.transform.DORotate(new Vector3(0, 0), delete ? 0 : .25f));
+
+            return seq;
+        }
 
     }
 }

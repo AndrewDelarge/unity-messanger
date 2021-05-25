@@ -39,15 +39,14 @@ namespace UI.Windows.Chat.Elements
         public void RemoveMessage(UIMessage message)
         {
             var messageGroup = messageGroups.Find(x => x.IsMessageExists(message));
-            messageGroup.RemoveMessage(message);
+            messageGroup.RemoveMessage(message, 
+                () => LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder));
 
             if (! messageGroup.AnyMessages())
             {
                 messageGroups.Remove(messageGroup);
                 Destroy(messageGroup.gameObject);
             }
-            
-            LayoutRebuilder.ForceRebuildLayoutImmediate(messagesHolder);
         }
 
         public void ToggleMessagesDeleteButtons(bool active)

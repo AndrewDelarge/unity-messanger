@@ -433,6 +433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainRectTransform: {fileID: 1047227282414431976}
+  messageContainer: {fileID: 1047227282056801632}
   textsLayout: {fileID: 1047227282056801635}
   nameText: {fileID: 1047227282058034283}
   messageText: {fileID: 1047227282651777216}
