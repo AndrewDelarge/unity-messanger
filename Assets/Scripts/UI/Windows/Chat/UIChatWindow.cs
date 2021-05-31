@@ -1,5 +1,6 @@
+using System;
 using Core;
-using Core.MessageSender;
+using Core.Base;
 using Core.Model;
 using UI.Base;
 using UI.WindowConfigs;
@@ -11,7 +12,7 @@ namespace UI.Windows.Chat
     public partial class UIChatWindow : UIWindow
     {
         private Core.Model.Chat chat;
-        private ISenderListener listener;
+        private AbstractMessageManager manager;
         private ChatWindowState currentState;
         
         [Header("Elements")]
@@ -19,7 +20,7 @@ namespace UI.Windows.Chat
         [SerializeField] private UISendPanel uiSendPanel;
         [SerializeField] private UIDeletePanel uiDeletePanel;
 
-        
+
         [Header("Templates")]
         [SerializeField] private UIMessage ownerMessageTemplate;
         [SerializeField] private UIMessage messageTemplate;
@@ -32,7 +33,7 @@ namespace UI.Windows.Chat
             var windowConfig = (ChatWindowConfig) config;
 
             chat = windowConfig.Chat;
-            listener = windowConfig.SenderListener;
+            manager = windowConfig.MessageManager;
         }
 
         public override void Open()
@@ -49,7 +50,7 @@ namespace UI.Windows.Chat
             uiSendPanel.OnDeleteModeButtonClick += () => SetState(new DeleteState(this));
             uiDeletePanel.OnCompleteDeleteClick += () => SetState(new WriteState(this));
 
-            listener.onMessageReceived = AddMessage;
+            manager.onMessageReceived += AddMessage;
         }
 
         private void AddMessage(Message message)

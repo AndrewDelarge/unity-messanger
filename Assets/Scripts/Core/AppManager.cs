@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using System.Linq;
-using CodeLib;
 using Core.Base;
-using Core.LocalData;
-using Core.MessageSender;
+using Core.MessageManager;
+using Core.Model;
 using Core.ResourceLoaders;
 using DG.Tweening;
 using UI.WindowConfigs;
 using UnityEngine;
-using User = Core.Model.User;
+using Chat = Core.Model.Chat;
+using Random = UnityEngine.Random;
 
 namespace Core
 {
-    public class AppManager : SingletonDD<AppManager>
+    public class AppManager : MonoBehaviour
     {
         private void Awake()
         {
@@ -31,42 +32,37 @@ namespace Core
             DontDestroyOnLoad(this);
         }
 
-        // TODO Here we should do states 
         private void ToLoadAllChatsState()
         {
-            var localMessagesStore = new LocalMessageStore();
+            var messageStoreManager = new LocalMessageStoreManager();
+            
             var loaderResult = (ChatLoaderResult) ResourceLoader.GetLoader(ResourceLoader.Resources.Chat).Load();
             var chats = loaderResult.loadedChats;
+
+            if (chats.Count > 0)
+            {
+                ToOpenChatState(chats.First(), messageStoreManager);
+
+                StartCoroutine(GetFakeMessage(messageStoreManager, chats.First()));
+            }
+        }
+
+        private void ToOpenChatState(Chat chat, AbstractMessageManager messageManager)
+        {
+            UIManager.Instance().OpenWindow(UIManager.UIWindows.Chat, new ChatWindowConfig(chat, messageManager));
+        }
+
+
+        private IEnumerator GetFakeMessage(AbstractMessageManager manager, Chat chat)
+        {
+            while (true)
+            {
+                var texts = new [] { "Привет", "Добрый дкнь", "Да", "Нет", "Пока", "Досвиданья!", "Драутути", "Как ваши дела?"};
             
-            var dictionaryListeners = InitChatListeners(chats, localMessagesStore);
-
-            if (dictionaryListeners.Count > 0)
-            {
-                var firstChat = dictionaryListeners.First();
-                
-                ToOpenChatState(firstChat.Key, firstChat.Value);
+                yield return new WaitForSeconds(Random.Range(10, 15));
+            
+                manager.ReceiveMessage(new Message(chat.GetRandomUser(), chat, texts[Random.Range(0, texts.Length)], DateTime.Now));
             }
-        }
-
-        private void ToOpenChatState(Model.Chat chat, ISenderListener senderListener)
-        {
-            UIManager.Instance().OpenWindow(UIManager.UIWindows.Chat, new ChatWindowConfig(chat, senderListener));
-        }
-
-        private static Dictionary<Model.Chat, ISenderListener> InitChatListeners(List<Model.Chat> chats,
-            LocalMessageStore localMessagesStore)
-        {
-            var listenersDictionary = new Dictionary<Model.Chat, ISenderListener>();
-
-            foreach (var chat in chats)
-            {
-                var listener = new SenderListener(chat);
-                localMessagesStore.AddListener(listener);
-
-                listenersDictionary.Add(chat, listener);
-            }
-
-            return listenersDictionary;
         }
     }
 }

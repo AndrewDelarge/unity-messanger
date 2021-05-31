@@ -30,6 +30,8 @@ namespace UI.Windows.Chat
                 
                 context.uiMessagesHolder.ToggleMessagesDeleteButtons(true);
                 context.uiMessagesHolder.onMessageDeleteButtonClick += context.uiMessagesHolder.RemoveMessage;
+                context.uiMessagesHolder.onMessageDeleteButtonClick +=
+                    message => context.manager.DeleteMessage(message.message);
                 
                 context.uiDeletePanel.GetShowSequence().Play();
             }
@@ -38,7 +40,12 @@ namespace UI.Windows.Chat
             {
                 context.uiMessagesHolder.ToggleMessagesDeleteButtons(false);
                 context.uiMessagesHolder.onMessageDeleteButtonClick -= context.uiMessagesHolder.RemoveMessage;
-                context.uiDeletePanel.GetHideSequence().Play().onKill += () => context.uiDeletePanel.gameObject.SetActive(false);
+                
+                context.uiMessagesHolder.onMessageDeleteButtonClick -=
+                    message => context.manager.DeleteMessage(message.message);
+                
+                context.uiDeletePanel.GetHideSequence().Play().onKill += 
+                    () => context.uiDeletePanel.gameObject.SetActive(false);
             }
         }
 
@@ -51,22 +58,22 @@ namespace UI.Windows.Chat
             public override void Activate()
             {
                 context.uiSendPanel.gameObject.SetActive(true);
-                context.uiSendPanel.OnTextSubmit += OnTextSubmit;
+                context.uiSendPanel.OnTextSubmit += OnTextInputSubmit;
 
                 context.uiSendPanel.GetShowSequence().Play();
             }
 
             public override void Deactivate()
             {
-                context.uiSendPanel.OnTextSubmit -= OnTextSubmit;
+                context.uiSendPanel.OnTextSubmit -= OnTextInputSubmit;
                 
                 context.uiSendPanel.GetHideSequence().Play().onKill += () => context.uiSendPanel.gameObject.SetActive(false);
 
             }
             
-            private void OnTextSubmit(string text)
+            private void OnTextInputSubmit(string text)
             {
-                context.listener.SendMessage(
+                context.manager.SendMessage(
                     new Message(context.chat.GetRandomUser(), context.chat, text, DateTime.Now)
                 );
             }
